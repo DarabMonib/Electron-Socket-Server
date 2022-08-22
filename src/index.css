@@ -15,6 +15,10 @@ body {
   
 }
 
+.timer {
+  display: none;
+}
+
 #display {
   width: 60%;
   height: auto;
@@ -75,8 +79,8 @@ body {
 }
 
 video {
-  /* border: 1px white solid; */
-  /* border: 5px tomato solid; */
+
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.304);
 
 }
 
@@ -84,3 +88,10 @@ video {
   padding: 0;
   margin: 0;
 } 
+
+.timer {
+  background-color: tomato;
+  color: white;
+  padding: 8px;
+  border-radius: 20px;
+}
