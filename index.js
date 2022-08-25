@@ -1,50 +1,58 @@
-var express = require('express');
+var app = require('express')();
 var socket = require('socket.io');
 var cors = require('cors');
 
-// Add Mongo Connection..
-const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://darab:QZQ3BmmE0nDjhKCE@cluster0.q8vwrhr.mongodb.net/?retryWrites=true&w=majority');
+app.get('/', (req, res) => res.send(200))
+var server = app.listen(process.env.PORT || 4000, () => console.log(`port => 4000`));
+let invitation = {
+    send: false,
+    accept: false
+};
 
-//Model...
-const Todo = mongoose.model('Todo', { todo: String, author: String });
-
-// App setup
-var app = express();
-var server = app.listen(3000, function(){
-    console.log('listening for requests on port 3000,');
-});
-
-// Static files
 app.use(cors());
 
-// Socket setup & pass server
 var io = socket(server);
 io.on('connection', (socket) => {
 
-    console.log('A User Connected!🎉', socket.id.substr(0,2));
-
-    // Handle chat event
-    // socket.on('test', (data) => {
-    //     io.emit('test', data);
-    // });
+    let xi = 0;
+    console.log('A new user just connected!')
 
     socket.on('todo', (data) => {
-
-        // 1. Post Data to mongo!... 
-        // 2. Send All new Data to the client side!..
-
-        // Saving to mongo!
-        // const todoItem = new Todo({ todo: item.todo, author: item.author });
-        // todoItem.save().then(() => {
-        //     console.log('item saved on mongo as well...')
-
-        // });
-        console.log('data came here!...')
-        console.log(data)
         io.emit('todo', data);
+    })
+    socket.on('typing', (data) => {
+        io.emit('typing', data);
+    })
+    socket.on('stopped', (data) => {
+        io.emit('stopped', data);
+    })
+    socket.on('video', (data) => {
+        io.emit('video', data);
+    })
+    socket.on('codeChange', (codeVal) => {
+        console.log('change!' + xi++, codeVal)
+        // socket.to().emit('codeChange', codeVal);
+        socket.broadcast.emit('codeChange', codeVal);
+    })
+    
+    socket.on('invitation', (state) => {
+        
+        if(state == 'send'){
+            invitation.send = true;
+        }
+        if(invitation.send && state == 'accept'){
+            invitation.accept = true;
+
+            if(invitation.send && invitation.accept){
+                io.emit('invitation', 'open code');
+                invitation.send = false
+                invitation.accept = false
+            }
+
+        }
 
     })
 
+    
 
 });
